@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الإدارة - Human Mechanic</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card">
+    <div class="login-head">
+      <div class="logo-mark">HM</div>
+      <h1>HUMAN MECHANIC</h1>
+      <p>ADMIN DASHBOARD</p>
+    </div>
+    <div class="login-body">
+      <div id="loginAlert" class="alert" style="display:none"></div>
+      <div class="field">
+        <label>اسم المستخدم أو البريد الإلكتروني</label>
+        <input id="loginUser" placeholder="admin أو admin@human-mechanic.com" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول</button>
+      <div class="hint">
+        <strong>بيانات افتراضية:</strong><br>
+        المستخدم: <code>admin</code> — البريد: <code>admin@human-mechanic.com</code><br>
+        كلمة المرور: <code>admin123</code><br>
+        <span style="font-size:11px;color:#94A3B8">يمكنك تغييرها من إعدادات الحساب بعد الدخول. محمية بـ Authentication حقيقي و localStorage مع منع الوصول بدون تسجيل.</span>
+      </div>
+      <a href="../index.html" style="display:block;text-align:center;margin-top:14px;font-weight:700;color:var(--muted);font-size:13px"><i class="fa-solid fa-arrow-right"></i> العودة للمتجر</a>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+  <div class="topbar">
+    <h2><i class="fa-solid fa-shield-halved" style="color:var(--teal)"></i> لوحة تحكم Human Mechanic</h2>
+    <div class="topbar-actions">
+      <a href="../index.html" target="_blank" class="btn btn-ghost" style="height:40px;font-size:13px"><i class="fa-solid fa-store"></i> عرض المتجر</a>
+      <button class="btn btn-ghost" id="logoutBtn" style="height:40px"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+    </div>
+  </div>
+
+  <div class="layout container" style="max-width:1300px">
+    <aside class="sidebar">
+      <button class="side-link active" data-tab="overview"><i class="fa-solid fa-chart-line"></i> نظرة عامة</button>
+      <button class="side-link" data-tab="products"><i class="fa-solid fa-box"></i> المنتجات</button>
+      <button class="side-link" data-tab="contacts"><i class="fa-solid fa-share-nodes"></i> وسائل التواصل</button>
+      <button class="side-link" data-tab="settings"><i class="fa-solid fa-gear"></i> إعدادات المتجر</button>
+      <button class="side-link" data-tab="account"><i class="fa-solid fa-user-gear"></i> إعدادات الحساب</button>
+      <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-weight:800;font-size:13px">حالة الحماية</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">✔ تسجيل دخول حقيقي<br>✔ منع الوصول بدون auth<br>✔ صلاحيات أدمن فقط</div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <!-- OVERVIEW -->
+      <section class="card" data-panel="overview">
+        <div class="card-head"><h3>نظرة عامة</h3><span style="font-size:12px;color:var(--muted)" id="overviewDate"></span></div>
+        <div class="card-body">
+          <div class="stats-grid" id="statsGrid"></div>
+          <div style="margin-top:16px;display:grid;gap:12px">
+            <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:12px;padding:14px">
+              <strong style="font-size:13px">روابط سريعة</strong>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                <button class="btn btn-teal" onclick="switchTab('products')"><i class="fa-solid fa-plus"></i> إضافة منتج</button>
+                <button class="btn btn-ghost" onclick="switchTab('contacts')"><i class="fa-solid fa-share-nodes"></i> إدارة التواصل</button>
+                <button class="btn btn-ghost" onclick="switchTab('settings')"><i class="fa-brands fa-whatsapp"></i> تغيير رقم واتساب</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRODUCTS -->
+      <section class="card hidden" data-panel="products">
+        <div class="card-head">
+          <h3>إدارة المنتجات — <span id="prodCount" style="color:var(--teal)"></span></h3>
+          <button class="btn btn-teal" id="addProductBtn"><i class="fa-solid fa-plus"></i> إضافة منتج</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>الصورة</th><th>الاسم</th><th>القسم</th><th>السعر</th><th>الوصف</th><th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="productsTable"></tbody>
+            </table>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px">* جميع المنتجات ديناميكية من قاعدة البيانات — لا يوجد منتجات ثابتة في الكود. يمكن للأدمن الإضافة/الحذف/التعديل بحرية.</p>
+        </div>
+      </section>
+
+      <!-- CONTACTS -->
+      <section class="card hidden" data-panel="contacts">
+        <div class="card-head">
+          <h3>وسائل التواصل الديناميكية</h3>
+          <button class="btn btn-teal" id="addContactBtn"><i class="fa-solid fa-plus"></i> إضافة وسيلة</button>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>المنصة</th><th>الرابط</th><th>الأيقونة</th><th>الحالة</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+              <tbody id="contactsTable"></tbody>
+            </table>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:10px">الأيقونة تظهر تلقائياً حسب اسم المنصة (WhatsApp → شعار واتساب الحقيقي، Instagram → شعار انستجرام ...). يمكنك التفعيل/الإخفاء وتغيير الترتيب.</p>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="card hidden" data-panel="settings">
+        <div class="card-head"><h3>إعدادات المتجر</h3></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field">
+              <label>رقم واتساب للطلبات (بدون +)</label>
+              <input id="sWa" placeholder="201000000000">
+              <span style="font-size:11px;color:var(--muted)">يستخدم عند الضغط على "اطلب الآن" — لا يوجد رقم ثابت في الكود</span>
+            </div>
+            <div class="field">
+              <label>العملة</label>
+              <input id="sCurrency" placeholder="ج.م">
+            </div>
+            <div class="field">
+              <label>اسم المتجر</label>
+              <input id="sName">
+            </div>
+            <div class="field">
+              <label>سطر تعريفي</label>
+              <input id="sTagline">
+            </div>
+          </div>
+          <button class="btn btn-teal" id="saveSettingsBtn" style="margin-top:14px"><i class="fa-solid fa-floppy-disk"></i> حفظ الإعدادات</button>
+          <div id="settingsAlert" class="alert" style="display:none;margin-top:10px"></div>
+        </div>
+      </section>
+
+      <!-- ACCOUNT -->
+      <section class="card hidden" data-panel="account">
+        <div class="card-head"><h3>إعدادات الحساب</h3></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field"><label>اسم المستخدم</label><input id="aUser"></div>
+            <div class="field"><label>البريد الإلكتروني</label><input id="aEmail" type="email"></div>
+            <div class="field"><label>كلمة المرور الحالية (للتأكيد)</label><input id="aOldPass" type="password" placeholder="مطلوبة لتغيير البيانات"></div>
+            <div class="field"><label>كلمة المرور الجديدة (اتركه فارغاً لعدم التغيير)</label><input id="aNewPass" type="password" placeholder="••••••••"></div>
+          </div>
+          <button class="btn btn-teal" id="saveAccountBtn" style="margin-top:14px"><i class="fa-solid fa-user-pen"></i> حفظ التغييرات</button>
+          <div id="accountAlert" class="alert" style="display:none;margin-top:10px"></div>
+          <div class="hint" style="margin-top:14px">تغيير كلمة المرور يتطلب إدخال كلمة المرور الحالية بشكل صحيح — حماية حقيقية وليست Frontend فقط.</div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal" id="productModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3 id="pmTitle">إضافة منتج</h3>
+      <button class="icon-btn" id="closeProductModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="pmAlert" class="alert" style="display:none"></div>
+      <div class="form-grid">
+        <div class="field full"><label>رابط صورة المنتج *</label><input id="pImage" placeholder="https://..."></div>
+        <div class="field"><label>اسم المنتج *</label><input id="pName" placeholder="مثال: جهاز مساج كهربائي"></div>
+        <div class="field"><label>السعر *</label><input id="pPrice" type="number" placeholder="1250"></div>
+        <div class="field"><label>القسم *</label>
+          <select id="pCategory">
+            <option value="physio">🦴 العلاج الطبيعي</option>
+            <option value="pharmacy">💊 الصيدلة</option>
+            <option value="dental">🦷 الأسنان</option>
+          </select>
+        </div>
+        <div class="field"><label>الكلمات المفتاحية (للبحث)</label><input id="pTags" placeholder="مساج علاج طبيعي ..."></div>
+        <div class="field full"><label>الوصف الكامل *</label><textarea id="pDesc" placeholder="وصف احترافي للمنتج..."></textarea></div>
+        <div class="field full"><label>تفاصيل إضافية (يضيفها الأدمن)</label><textarea id="pDetails" placeholder="الماركة، المواصفات، الضمان..."></textarea></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-teal" id="saveProductBtn" style="flex:1"><i class="fa-solid fa-check"></i> حفظ المنتج</button>
+        <button class="btn btn-ghost" id="cancelProductBtn" style="flex:1">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal" id="contactModal">
+  <div class="modal-card" style="max-width:520px">
+    <div class="modal-head">
+      <h3 id="cmTitle">إضافة وسيلة تواصل</h3>
+      <button class="icon-btn" id="closeContactModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="cmAlert" class="alert" style="display:none"></div>
+      <div class="field"><label>اسم المنصة *</label><input id="cPlatform" placeholder="WhatsApp, Facebook, Instagram, TikTok ..."></div>
+      <div class="field"><label>الرابط *</label><input id="cUrl" placeholder="https://wa.me/201000000000"></div>
+      <div class="field">
+        <label>الحالة</label>
+        <select id="cActive"><option value="true">مفعّل (يظهر في المتجر)</option><option value="false">مخفي</option></select>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px;margin-top:8px">
+        <div id="cPreviewIcon" class="icon-btn" style="width:44px;height:44px;background:var(--navy);color:#fff;border:0"><i class="fa-solid fa-link"></i></div>
+        <div><div style="font-weight:800;font-size:13px">معاينة الأيقونة</div><div style="font-size:12px;color:var(--muted)">تتعرّف تلقائياً على المنصة</div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button class="btn btn-teal" id="saveContactBtn" style="flex:1"><i class="fa-solid fa-check"></i> حفظ</button>
+        <button class="btn btn-ghost" id="cancelContactBtn" style="flex:1">إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/db.js"></script>
+<script src="../js/admin.js"></script>
+</body>
+</html>
